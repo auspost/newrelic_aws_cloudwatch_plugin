@@ -104,6 +104,18 @@ module NewRelicAWS
         @components_collection = Components::Collection.new("com.newrelic.aws.#{agent_name}", NewRelicAWS::VERSION)
         @context = NewRelic::Binding::Context.new(NewRelic::Plugin::Config.config.newrelic['license_key'])
         @context.version = NewRelicAWS::VERSION
+        if NewRelic::Plugin::Config.config.newrelic["proxy_uri"] != nil then
+          uri = URI.parse(NewRelic::Plugin::Config.config.newrelic["proxy_uri"])
+          proxy = {
+            'address' => uri.host,
+            'port' => uri.port
+          }
+          if uri.userinfo != nil then
+            proxy['user'] = uri.userinfo.split(/:/)[0]
+            proxy['password'] = uri.userinfo.split(/:/)[1]
+          end
+          NewRelic::Binding::Config.proxy = proxy
+        end
       end
 
       def poll_cycle
