@@ -66,3 +66,7 @@ agents:
     enabled: false
   ecr:
     enabled: false
+  kin:
+    enabled: false
+  lam:
+    enabled: false

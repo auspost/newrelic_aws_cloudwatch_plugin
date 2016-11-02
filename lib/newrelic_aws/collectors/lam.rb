@@ -1,47 +1,37 @@
 module NewRelicAWS
   module Collectors
     class LAM < Base
-      def lambda_function
+      def lambda_functions
         lambda = Aws::Lambda::Client.new(
           :access_key_id => @aws_access_key,
           :secret_access_key => @aws_secret_key,
           :region => @aws_region,
           :http_proxy => @aws_proxy_uri
         )
-        elb.describe_load_balancers.load_balancer_descriptions.map { |load_balancer| load_balancer.load_balancer_name }
+        lambda.list_functions.functions.map { |name| name.function_name }
       end
 
       def metric_list
         [
-          ["Latency", "Average", "Seconds"],
-          ["RequestCount", "Sum", "Count", 0],
-          ["HealthyHostCount", "Maximum", "Count", 0],
-          ["UnHealthyHostCount", "Maximum", "Count", 0],
-          ["HTTPCode_ELB_4XX", "Sum", "Count", 0],
-          ["HTTPCode_ELB_5XX", "Sum", "Count", 0],
-          ["HTTPCode_Backend_2XX", "Sum", "Count", 0],
-          ["HTTPCode_Backend_3XX", "Sum", "Count", 0],
-          ["HTTPCode_Backend_4XX", "Sum", "Count", 0],
-          ["HTTPCode_Backend_5XX", "Sum", "Count", 0],
-          ["BackendConnectionErrors", "Sum", "Count", 0],
-          ["SurgeQueueLength", "Maximum", "Count", 0],
-          ["SpilloverCount", "Sum", "Count", 0]
+          ["Duration", "Average", "Milliseconds"],
+          ["Errors", "Average", "Count"],
+          ["Invocations" , "Average", "Count"],
+          ["Throttles", "Average", "Count"]
         ]
       end
 
       def collect
         data_points = []
-        load_balancers.each do |load_balancer_name|
-          metric_list.each do |(metric_name, statistic, unit, default_value)|
+        lambda_functions.each do |function_name|
+          metric_list.each do |(metric_name, statistic, unit)|
             data_point = get_data_point(
-              :namespace     => "AWS/ELB",
+              :namespace     => "AWS/Lambda",
               :metric_name   => metric_name,
               :statistic     => statistic,
               :unit          => unit,
-              :default_value => default_value,
               :dimension     => {
-                :name  => "LoadBalancerName",
-                :value => load_balancer_name
+                :name  => "FunctionName",
+                :value => function_name
               }
             )
             NewRelic::PlatformLogger.debug("metric_name: #{metric_name}, statistic: #{statistic}, unit: #{unit}, response: #{data_point.inspect}")
