@@ -21,6 +21,7 @@ aws:
   # Update with you AWS account keys:
   access_key: 'YOUR_AWS_ACCESS_KEY_HERE'
   secret_key: 'YOUR_AWS_SECRET_KEY_HERE'
+  account_id: 'YOUR_AWS_ACCOUNT_ID_HERE'
 
   #Use the following if you would like to configure AWS keys with ENV variables
   #access_key: <%= ENV['AWS_ACCESS_KEY'] %>
@@ -71,4 +72,6 @@ agents:
   lam:
     enabled: false
   cfd:
+    enabled: false
+  es:
     enabled: false
