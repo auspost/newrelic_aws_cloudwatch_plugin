@@ -16,7 +16,9 @@ module NewRelicAWS
           ["Duration", "Average", "Milliseconds"],
           ["Errors", "Average", "Count"],
           ["Invocations" , "Average", "Count"],
-          ["Throttles", "Average", "Count"]
+          ["Throttles", "Average", "Count"],
+          ["ConcurrentExecutions", "Maximum","Count"],
+          ["UnreservedConcurrentExecutions", "Maximum","Count"]
         ]
       end
 
